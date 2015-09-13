@@ -29,6 +29,11 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
     $scope.modal.show();
   };
 
+
+  $scope.salir = function(){
+      ionic.Platform.exitApp();
+  };
+
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     console.log('Doing login', $scope.loginData);
@@ -102,7 +107,35 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
       icon:{url:"img/parkinggarage.png"}
     });
 
-    console.log("Puntos a mostrar: ", $scope.puntos);
+    //console.log("",$rootScope.ordenSelected);
+    var puntosPath = [];
+    for( var iPath in $rootScope.ordenSelected.ruta ){
+        //console.log( "Ruta Simple::", $rootScope.ordenSelected.ruta[iPath] );
+        var pos = $rootScope.ordenSelected.ruta[iPath];
+        var objPath = { latitude: pos[0], longitude: pos[1] };
+        puntosPath.push( objPath );
+    }
+    //console.log("Rutas: ", puntosPath);
+    
+    $scope.polylines = [
+            {
+                id: 1,
+                path: puntosPath,
+                stroke: {
+                    color: '#6060FB',
+                    weight: 3
+                },
+                editable: false,
+                draggable: false,
+                geodesic: false,
+                visible: true,
+                icons: [{
+                    offset: '25px',
+                    repeat: '50px'
+                }]
+            }
+        ];
+    //console.log("Puntos a mostrar: ", $scope.puntos);
   }
 
   $scope.initMap();

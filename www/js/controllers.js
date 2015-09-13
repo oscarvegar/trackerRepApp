@@ -29,6 +29,11 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
     $scope.modal.show();
   };
 
+
+  $scope.salir = function(){
+      ionic.Platform.exitApp();
+  };
+
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     console.log('Doing login', $scope.loginData);
@@ -125,9 +130,6 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
                 geodesic: false,
                 visible: true,
                 icons: [{
-                    icon: {
-                        path: google.maps.SymbolPath.BACKWARD_OPEN_ARROW
-                    },
                     offset: '25px',
                     repeat: '50px'
                 }]

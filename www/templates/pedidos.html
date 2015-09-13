@@ -5,17 +5,16 @@
 	        <a class="item item-avatar" ng-repeat= "pedido in pedidos" 
 	           href="#/app/mapa" ng-click="goMapa($index)">
 		      <img src="img/modelorama.jpg">
-		      <h2>Pedido</h2>
+		      <h2>Pedido {{pedido.totalCompra | currency}}</h2>
 		      <p>{{pedido.nombre}}</p>
-		      <p>Dirección: {{pedido.direccion.direccionCompleta}}</p>
+		      <p>Dirección: {{pedido.direccionCompleta}}</p>
 		      <p>
 		      	Detalle<br/>
-		      	<table>
+		      	<table style="font-size:11px;">
 		      		<tr ng-repeat="orden in pedido.detalle">
-		      			<td>Producto</td>
-		      			<td>{{orden.producto.descripcion}}
-		      			<td>Cantidad</td>
 		      			<td>{{orden.cantidad}}</td>
+		      			<td> - </td>
+		      			<td>{{orden.nombre}} {{orden.presentacion}}</td>
 		      		</tr>
 		      	</table>
 		      </p>

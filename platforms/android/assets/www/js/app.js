@@ -16,22 +16,30 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
-  
-    $interval(function(){
-      var posOptions = {timeout: 10000, enableHighAccuracy: false};
-      $cordovaGeolocation
-        .getCurrentPosition(posOptions)
-        .then(function (position) {
-            var latitude  = position.coords.latitude
-            var longitude = position.coords.longitude
-            var request = {id:"55f4e2e42ac16ca1293d7706", coordinates:[longitude, latitude]};
-            $http.post( _HOST + "/api/repartidor/updateLocation/", request)
-            .then(function(res){});
-        }, function(err) {
-          //alert("Error al obtener ubicación: " + err);
-      });
-    },30000);
+  $http.get( _HOST_PUSH_SERVER + "/api/repartidor/all").then(function(result){
+    console.log( "Result:: ", result );
+    if( result.data.length > 0 ){
+      $rootScope.repartidor = result.data[0];
+    }
+  });
 
+  $interval(function(){
+    var posOptions = {timeout: 10000, enableHighAccuracy: false};
+    $cordovaGeolocation
+      .getCurrentPosition(posOptions)
+      .then(function (position) {
+          var latitude  = position.coords.latitude
+          var longitude = position.coords.longitude
+          var request = {id:$rootScope.repartidor.id, coordinates:[longitude, latitude]};
+          console.log("enviando posicion: ", request);
+          $http.post( _HOST + "/api/repartidor/updateLocation/", request)
+          .then(function(res){});
+      }, function(err) {
+        //alert("Error al obtener ubicación: " + err);
+    });
+  },30000);
+
+  
 
     $rootScope.scheduleSingleNotification = function (id, data) {
       $cordovaLocalNotification.schedule({
