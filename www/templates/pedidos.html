@@ -1,0 +1,25 @@
+<ion-view view-title="MIS PEDIDOS">
+	<ion-content>
+		<div ng-show="pedidos.length <= 0"> No tienes pedidos </div>
+		<div class="list" ng-show="pedidos.length > 0">
+	        <a class="item item-avatar" ng-repeat= "pedido in pedidos" 
+	           href="#/app/mapa" ng-click="goMapa($index)">
+		      <img src="img/modelorama.jpg">
+		      <h2>Pedido</h2>
+		      <p>{{pedido.nombre}}</p>
+		      <p>Dirección: {{pedido.direccion.direccionCompleta}}</p>
+		      <p>
+		      	Detalle<br/>
+		      	<table>
+		      		<tr ng-repeat="orden in pedido.detalle">
+		      			<td>Producto</td>
+		      			<td>{{orden.producto.descripcion}}
+		      			<td>Cantidad</td>
+		      			<td>{{orden.cantidad}}</td>
+		      		</tr>
+		      	</table>
+		      </p>
+		    </a>
+	 	</div>
+	</ion-content>
+</ion-view>
