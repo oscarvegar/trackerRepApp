@@ -102,30 +102,27 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
       icon:{url:"img/parkinggarage.png"}
     });
 
+    //console.log("",$rootScope.ordenSelected);
+    var puntosPath = [];
+    for( var iPath in $rootScope.ordenSelected.ruta ){
+        //console.log( "Ruta Simple::", $rootScope.ordenSelected.ruta[iPath] );
+        var pos = $rootScope.ordenSelected.ruta[iPath];
+        var objPath = { latitude: pos[0], longitude: pos[1] };
+        puntosPath.push( objPath );
+    }
+    //console.log("Rutas: ", puntosPath);
+    
     $scope.polylines = [
             {
                 id: 1,
-                path: [
-                    {
-                        latitude: $scope.puntos[0].latitude,
-                        longitude: $scope.puntos[0].longitude
-                    },
-                    {
-                        latitude: $scope.puntos[1].latitude,
-                        longitude: $scope.puntos[1].longitude
-                    },
-                    {
-                        latitude: $scope.puntos[2].latitude,
-                        longitude: $scope.puntos[2].longitude
-                    }
-                ],
+                path: puntosPath,
                 stroke: {
                     color: '#6060FB',
                     weight: 3
                 },
-                editable: true,
-                draggable: true,
-                geodesic: true,
+                editable: false,
+                draggable: false,
+                geodesic: false,
                 visible: true,
                 icons: [{
                     icon: {
@@ -136,7 +133,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
                 }]
             }
         ];
-    console.log("Puntos a mostrar: ", $scope.puntos);
+    //console.log("Puntos a mostrar: ", $scope.puntos);
   }
 
   $scope.initMap();
