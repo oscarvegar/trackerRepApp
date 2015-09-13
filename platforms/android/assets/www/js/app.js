@@ -15,6 +15,32 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
   
+    $rootScope.scheduleSingleNotification = function () {
+      $cordovaLocalNotification.schedule({
+        id: 1,
+        title: 'Title here',
+        text: 'Text here',
+        data: {
+          customProperty: 'custom value'
+        }
+      }).then(function (result) {
+        alert("Result Noti: " + JSON.stringify(result));
+      });
+    };
+
+    $rootScope.updateNotifications = function (chosenHours) {
+      cordova.plugins.notification.local.cancelAll(); 
+      var now = new Date().getTime(),
+          _5_sec_from_now = new Date(now + 5 * 1000);
+      cordova.plugins.notification.local.schedule({
+              title: "Tweet Hours are Starting",
+              text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec magna libero. Ut at massa pellentesque massa euismod volutpat id quis metus.",
+              at: _5_sec_from_now,
+              badge: 1
+      });
+    };
+
+
     HOST = "http://192.168.1.72:1337";
     io.sails.url = 'http://192.168.1.72:1337';
 

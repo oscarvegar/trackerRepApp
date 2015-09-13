@@ -41,20 +41,11 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('PedidosCtrl', function( $scope, $ionicModal, $cordovaLocalNotification, $timeout ){  
+.controller('PedidosCtrl', function( $scope, $rootScope, $ionicModal, $cordovaLocalNotification, $timeout ){  
   $scope.init = function(){
     io.socket.get('/api/orden/subscribe',function(data,jwres){
       alert("subscrito: " + JSON.stringify(data) );
-      $cordovaLocalNotification.schedule({
-          id: "1",
-          title: 'Solicitud de Servicio',
-          text: "obj.data.texto",
-          data: data
-        }).then(function (result) {
-          // ...
-        }).catch(function(err){
-          alert(err)
-        });
+      $rootScope.scheduleSingleNotification();
     });
     
 
@@ -64,16 +55,7 @@ angular.module('starter.controllers', [])
   
   io.socket.on('create', function(obj){
     alert("Nueva Solicitud:: " + JSON.stringify(obj) );
-    $cordovaLocalNotification.schedule({
-        id: "1",
-        title: "Nueva orden de servicio",
-        text: "Tiene ud. una nueva orden de servicio",
-        data: {msg:"data"}
-    }).then(function (result) {
-        alert(" Result: " + result);
-    }).catch(function(err){
-        alert(err)
-    });
+    
   });
 
 
