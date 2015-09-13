@@ -8,37 +8,62 @@ var _HOST_PUSH_SERVER = "http://192.168.1.72:1337";
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama', 'ngCordova'])
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama', 'ngCordova', 'uiGmapgoogle-maps'])
 
-.run(function($ionicPlatform, $cordovaLocalNotification, $rootScope) {
+.run(function($ionicPlatform, $cordovaLocalNotification, $rootScope, $ionicPopup, 
+  $interval, $http, $cordovaGeolocation, $state) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
   
-    $rootScope.scheduleSingleNotification = function () {
-      $cordovaLocalNotification.schedule({
-        id: 1,
-        title: 'Title here',
-        text: 'Text here',
-        data: {
-          customProperty: 'custom value'
-        }
-      }).then(function (result) {
-        alert("Result Noti: " + JSON.stringify(result));
+    $interval(function(){
+      var posOptions = {timeout: 10000, enableHighAccuracy: false};
+      $cordovaGeolocation
+        .getCurrentPosition(posOptions)
+        .then(function (position) {
+            var latitude  = position.coords.latitude
+            var longitude = position.coords.longitude
+            var request = {id:"55f4e2e42ac16ca1293d7706", coordinates:[longitude, latitude]};
+            $http.post( _HOST + "/api/repartidor/updateLocation/", request)
+            .then(function(res){});
+        }, function(err) {
+          //alert("Error al obtener ubicación: " + err);
       });
+    },30000);
+
+    $rootScope.scheduleSingleNotification = function (id, data) {
+      $cordovaLocalNotification.schedule({
+        id: id,
+        title: 'NUEVA ORDEN DE ENTREGA',
+        text: 'Tienes una nueva orden de entrega',
+        data: data
+      }).then(function (result) {
+        var myPopup = $ionicPopup.show({
+            template: '<center>Tienes una nueva orden de entrega</center>',
+            title: 'NUEVA ORDEN DE ENTREGA',
+            scope: $scope,
+            buttons: [ { text: 'Cancelar' },
+                       {text: '<b>Aceptar</b>',type: 'button-positive',
+                        onTap:function(e){
+                          return data;
+                        }}]
+        });
+         myPopup.then(function(res) {
+            if(res){
+                alert("Ver detalle de la compra: " + res);
+            }
+        });
+      });
+
+
     };
 
-    $rootScope.updateNotifications = function (chosenHours) {
-      cordova.plugins.notification.local.cancelAll(); 
-      var now = new Date().getTime(),
-          _5_sec_from_now = new Date(now + 5 * 1000);
-      cordova.plugins.notification.local.schedule({
-              title: "Tweet Hours are Starting",
-              text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec magna libero. Ut at massa pellentesque massa euismod volutpat id quis metus.",
-              at: _5_sec_from_now,
-              badge: 1
-      });
-    };
+   $rootScope.$on('$cordovaLocalNotification:click',
+      function (event, notification, state) {
+        //alert("notification **ver detalle de la compra**: " );
+        $state.go("app.pedidos");
+    });
+
 
 
     HOST = "http://192.168.1.72:1337";
@@ -54,34 +79,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
       StatusBar.styleDefault();
     }
 
-    $rootScope.$on('$cordovaLocalNotification:click',
-      function (event, notification, state) {
-      alert("notification : "+JSON.parse(notification));
-    });
+    
 
-    $rootScope.$on('$cordovaPush:notificationReceived', function(event, notification) {
-      alert(JSON.stringify(notification))
-      switch(notification.event) {
-        case 'registered':
-          if (notification.regid.length > 0 ) {
-            alert('registration ID = ' + notification.regid);
-          }
-          break;
-        case 'message':
-          alert("notificaction message event: " + JSON.stringify(notification))
-          break;
-
-        case 'error':
-          alert('GCM error = ' + notification.msg);
-          break;
-
-        default:
-          alert('An unknown GCM event has occurred');
-          break;
-        }
-      });
-
+    
   });
+
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
@@ -118,6 +120,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
         'menuContent': {
           templateUrl: 'templates/pedidos.html',
           controller: 'PedidosCtrl'  
+        }
+      }
+    })
+    .state('app.mapa', {
+      url: '/mapa',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/mapa.html',
+          controller: 'MapaCtrl'  
         }
       }
     });

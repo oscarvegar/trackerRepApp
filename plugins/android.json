@@ -64,6 +64,16 @@
                             "xml": "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />",
                             "count": 1
                         }
+                    ],
+                    "/*": [
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />",
+                            "count": 1
+                        }
                     ]
                 }
             }
@@ -76,7 +86,11 @@
         "de.appplant.cordova.plugin.local-notification": {
             "PACKAGE_NAME": "com.ionicframework.trackerrepapp633010"
         },
+<<<<<<< Updated upstream
         "org.apache.cordova.splashscreen": {
+=======
+        "org.apache.cordova.geolocation": {
+>>>>>>> Stashed changes
             "PACKAGE_NAME": "com.ionicframework.trackerrepapp633010"
         }
     },
