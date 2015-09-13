@@ -16,6 +16,13 @@ module.exports = [
         ]
     },
     {
+        "file": "plugins/org.apache.cordova.splashscreen/www/splashscreen.js",
+        "id": "org.apache.cordova.splashscreen.SplashScreen",
+        "clobbers": [
+            "navigator.splashscreen"
+        ]
+    },
+    {
         "file": "plugins/org.apache.cordova.device/www/device.js",
         "id": "org.apache.cordova.device.device",
         "clobbers": [
@@ -28,6 +35,7 @@ module.exports.metadata =
 {
     "com.ionic.keyboard": "1.0.4",
     "de.appplant.cordova.plugin.local-notification": "0.8.1",
+    "org.apache.cordova.splashscreen": "1.0.0",
     "org.apache.cordova.device": "0.3.0"
 }
 // BOTTOM OF METADATA

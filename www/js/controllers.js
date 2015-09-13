@@ -39,6 +39,12 @@ angular.module('starter.controllers', [])
       $scope.closeLogin();
     }, 1000);
   };
+
+
+ $scope.salir = function (){
+   ionic.Platform.exitApp();
+ };
+
 })
 
 .controller('PedidosCtrl', function( $scope, $rootScope, $ionicModal, $cordovaLocalNotification, $timeout ){  
