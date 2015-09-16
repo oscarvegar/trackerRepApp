@@ -1,6 +1,11 @@
+
+var _HOST = "http://yoplanner.com:1337";
+io.sails.url = 'http://yoplanner.com:1337';
+var _HOST_PUSH_SERVER = "http://yoplanner.com:1337";
+
 angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $rootScope, $ionicModal, $timeout) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -11,6 +16,11 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
   // Form data for the login modal
   $scope.loginData = {};
+  $scope.idCount = 0;
+  $scope.idPolyLineCount = 0;
+  $scope.idPointCount = 0;
+  $rootScope.pedidos = [];
+  $rootScope.username = "oscar.vega";
 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -44,20 +54,39 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
       $scope.closeLogin();
     }, 1000);
   };
+
+  $scope.init = function(){
+    io.socket.get( _HOST + '/api/orden/subscribe',function(data,jwres){}); 
+    alert("ha quedado subscrito ... " + _HOST ); 
+  }
+
+  $scope.init();
+  
+
 })
 
-.controller('PedidosCtrl', function( $scope, $rootScope, $ionicModal, $cordovaLocalNotification, $timeout ){  
-  $scope.idCount = 0;
-  $scope.init = function(){
-    io.socket.get('/api/orden/subscribe',function(data,jwres){});
+.controller('PedidosCtrl', function( $scope, $rootScope, $ionicModal, 
+  $cordovaLocalNotification, $timeout, $state ){  
+  $scope.goMapa = function(index){
+    $rootScope.ordenSelected = $rootScope.pedidos[index];
   }
-  $scope.init();
-  $rootScope.pedidos = [];
-  io.socket.on('create', function(obj){
-    $rootScope.ordenNueva = obj;
+})
+
+.controller('MapaCtrl', function( $scope, $rootScope, $timeout ){  
+  $scope.puntos = [];
+  $scope.polylines = [];
+
+
+  io.socket.on('create', function(obj) {
+    $rootScope.ordenSelected = obj;
+    console.log("Nueva Orden::: ", $rootScope.ordenSelected ); 
+    alert("Nueva Orden::: " + $rootScope.ordenSelected ); 
+    // Si el usuairo repartido logueado no esta asignado a la orden, no hacer nada
+    if( obj.usuario.username !== $rootScope.username ) return;
+    
     if( $rootScope.pedidos.length === 0 ){
       $rootScope.pedidos.push( obj );
-    }else{
+    } else {
       var existe = false;
       for( var ip in $rootScope.pedidos ){
         if($rootScope.pedidos[ip].id === obj.id){
@@ -69,57 +98,53 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
         $rootScope.pedidos.push( obj );
       }
     }
-    console.log("Nueva Orden -pedidos-: ", $rootScope.pedidos); 
-    $scope.$apply();
+    console.log("Nueva Orden - pedidos-: ", $rootScope.pedidos); 
+    $scope.dibujarOrdenes(obj); 
+    $scope.$applyAsync();
+    $ionicScrollDelegate.scrollBottom(true);
     $rootScope.scheduleSingleNotification( ++$scope.idCount, obj );
   });
 
-  $scope.goMapa = function(index){
-    $rootScope.ordenSelected = $rootScope.pedidos[index];
+
+  $scope.initMap = function() {
+    $scope.map = { center: { latitude: 19.432791, longitude: -99.1335314 }, zoom: 10 };
+    if( $rootScope.pedidos.length > 0 ){
+      $scope.dibujarOrdenes();
+    }
+
   }
 
-})
+  $scope.dibujarOrdenes = function(ordenSelected){
+      
+        $scope.puntos.push({ id:$scope.idPointCount++,
+                             latitude:eval(ordenSelected.repartidor.currentLocation.coordinates[1]),
+                             longitude:eval(ordenSelected.repartidor.currentLocation.coordinates[0]),
+                             icon:{url:"img/vespa.png"}
+                          });
 
-.controller('MapaCtrl', function( $scope, $rootScope, $timeout ){  
-  $scope.initMap = function(){
-    $scope.map = { center: { latitude: 19.432791, longitude: -99.1335314 }, zoom: 6 };
-    //$scope.markerIconSize = new google.maps.Size(30,30);
-    
-    $scope.puntos = [];
-    $scope.puntos.push({
-      id:0,
-      latitude:eval($rootScope.ordenSelected.repartidor.currentLocation.coordinates[1]),
-      longitude:eval($rootScope.ordenSelected.repartidor.currentLocation.coordinates[0]),
-      icon:{url:"img/construction.png"}
-    });
+        $scope.puntos.push({id:$scope.idPointCount++,
+                            latitude:eval(ordenSelected.modelorama.location.coordinates[1]),
+                            longitude:eval(ordenSelected.modelorama.location.coordinates[0]),
+                            icon:{url:"img/office-building.png"}
+                          });
 
-    $scope.puntos.push({
-      id:1,
-      latitude:eval($rootScope.ordenSelected.modelorama.location.coordinates[1]),
-      longitude:eval($rootScope.ordenSelected.modelorama.location.coordinates[0]),
-      icon:{url:"img/office-building.png"}
-    });
+        $scope.puntos.push({id:$scope.idPointCount++,
+                            latitude:eval(ordenSelected.location.coordinates[1]),
+                            longitude:eval(ordenSelected.location.coordinates[0]),
+                            icon:{url:"img/orden.png"}
+                          });
 
-    $scope.puntos.push({
-      id:2,
-      latitude:eval($rootScope.ordenSelected.location.coordinates[1]),
-      longitude:eval($rootScope.ordenSelected.location.coordinates[0]),
-      icon:{url:"img/parkinggarage.png"}
-    });
-
-    //console.log("",$rootScope.ordenSelected);
-    var puntosPath = [];
-    for( var iPath in $rootScope.ordenSelected.ruta ){
-        //console.log( "Ruta Simple::", $rootScope.ordenSelected.ruta[iPath] );
-        var pos = $rootScope.ordenSelected.ruta[iPath];
-        var objPath = { latitude: pos[0], longitude: pos[1] };
-        puntosPath.push( objPath );
-    }
-    //console.log("Rutas: ", puntosPath);
-    
-    $scope.polylines = [
+        
+        var puntosPath = [];
+        for( var iPath in ordenSelected.ruta ){
+          //console.log( "Ruta Simple::", $rootScope.ordenSelected.ruta[iPath] );
+          var pos = ordenSelected.ruta[iPath];
+          var objPath = { latitude: pos[0], longitude: pos[1] };
+          puntosPath.push( objPath );
+        }
+        $scope.polylines.push(
             {
-                id: 1,
+                id: $scope.idPolyLineCount,
                 path: puntosPath,
                 stroke: {
                     color: '#6060FB',
@@ -134,11 +159,11 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
                     repeat: '50px'
                 }]
             }
-        ];
-    //console.log("Puntos a mostrar: ", $scope.puntos);
+        );
+      
   }
 
+
   $scope.initMap();
-  
 
 });

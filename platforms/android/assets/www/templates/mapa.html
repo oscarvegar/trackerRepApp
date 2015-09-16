@@ -3,11 +3,44 @@
 		<style type="text/css">
 			.angular-google-map-container { height: 75vh; }
 		</style>
-		<ui-gmap-google-map center='map.center' zoom='map.zoom'>
-			<ui-gmap-markers models="puntos" coords="'self'" icon="'icon'"></ui-gmap-markers>
-			<ui-gmap-polyline ng-repeat="p in polylines" path="p.path" stroke="p.stroke" 
-				visible='p.visible' geodesic='p.geodesic' fit="false" editable="p.editable" draggable="p.draggable" icons='p.icons'>
-			</ui-gmap-polyline>
-		</ui-gmap-google-map>
+		<div  class="list">
+			<a class="item" href="#">
+				<ui-gmap-google-map center='map.center' zoom='map.zoom'>
+					<ui-gmap-markers models="puntos" coords="'self'" icon="'icon'"></ui-gmap-markers>
+					<ui-gmap-polyline ng-repeat="p in polylines" path="p.path" stroke="p.stroke" 
+						visible='p.visible' geodesic='p.geodesic' fit="false" editable="p.editable" draggable="p.draggable" icons='p.icons'>
+					</ui-gmap-polyline>
+				</ui-gmap-google-map>
+			</a>
+			<a class="item" href="#" ng-show="ordenSelected">
+				<h2>TOTAL DE LA COMPRA</h2>
+      			<p>{{ordenSelected.totalCompra | currency}}</p>
+      		</a>
+			<a class="item" href="#" ng-show="ordenSelected">
+				<h2>Nombre del Cliente</h2>
+      			<p>{{ordenSelected.nombre}} {{ordenSelected.ap_pat}} {{ordenSelected.ap_mat}}</p>
+      		</a>
+      		<a class="item" href="#" ng-show="ordenSelected">
+				<h2>Dirección</h2>
+      			<p>{{ordenSelected.direccionCompleta}}</p>
+      		</a>
+      		<a class="item" href="#" ng-show="ordenSelected">
+				<h2>Modelorama mas cercano</h2>
+      			<p>{{ordenSelected.modelorama.direccion}}</p>
+      		</a>
+      		<a class="item" href="#" ng-show="ordenSelected">
+				<h2>Detalle del Pedido</h2>
+      			<p>
+      				<table>
+      					<tr ng-repeat="producto in ordenSelected.detalle">
+      						<td>{{producto.cantidad}}</td>
+      						<td>-</td>
+      						<td>{{producto.producto}}</td>
+      					</tr>
+      				</table>
+      			</p>
+      		</a>
+
+		</div>
 	</ion-content>
 </ion-view>

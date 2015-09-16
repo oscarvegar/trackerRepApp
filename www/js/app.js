@@ -1,32 +1,38 @@
-var _HOST = "http://yoplanner.com:1337";
-io.sails.url = 'http://yoplanner.com:1337';
-var _HOST_PUSH_SERVER = "http://yoplanner.com:1337";
-
 // Ionic Starter App
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama', 
+
+
+var _HOST = "http://yoplanner.com:1337";
+io.sails.url = 'http://yoplanner.com:1337';
+var _HOST_PUSH_SERVER = "http://yoplanner.com:1337";
+
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama', 'dao',
   'ngCordova', 'uiGmapgoogle-maps'])
 
 .run(function($ionicPlatform, $cordovaLocalNotification, $rootScope, $ionicPopup, 
-  $interval, $http, $cordovaGeolocation, $state,$timeout) {
+  $interval, $http, $cordovaGeolocation, $state, $timeout, DB) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
-  $http.get( _HOST_PUSH_SERVER + "/api/repartidor/all").then(function(result){
-    console.log( "Result:: ", result );
-    if( result.data.length > 0 ){
-      $rootScope.repartidor = result.data[0];
-    }
-  });
+    $http.get( _HOST_PUSH_SERVER + "/api/repartidor/all").then(function(result){
+      console.log( "Result:: ", result );
+      if( result.data.length > 0 ){
+        $rootScope.repartidor = result.data[0];
+        console.log("repartidor: ", $rootScope.repartidor);
+      }
+    });
 
-  $interval(function(){
-    var posOptions = {timeout: 10000, enableHighAccuracy: false};
-    $cordovaGeolocation
-      .getCurrentPosition(posOptions)
+    $interval(function(){
+      $rootScope.sendGeoPosition();
+    },30000);
+
+    $rootScope.sendGeoPosition = function() {
+      var posOptions = {timeout: 10000, enableHighAccuracy: true};
+      $cordovaGeolocation.getCurrentPosition(posOptions)
       .then(function (position) {
           var latitude  = position.coords.latitude
           var longitude = position.coords.longitude
@@ -34,12 +40,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
           console.log("enviando posicion: ", request);
           $http.post( _HOST + "/api/repartidor/updateLocation/", request)
           .then(function(res){});
-      }, function(err) {
-        //alert("Error al obtener ubicación: " + err);
-    });
-  },30000);
-
-  
+        }, function(err) { });
+    }
 
     $rootScope.scheduleSingleNotification = function (id, data) {
       $cordovaLocalNotification.schedule({
@@ -74,11 +76,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
         $state.go("app.pedidos");
     });
 
-
-
-    HOST = "http://yoplanner.com:1337";
-    io.sails.url = 'http://yoplanner.com:1337';
-
     if (window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
@@ -88,8 +85,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+
+
     
   });
+
+  DB.init();
 
 })
 
@@ -121,6 +122,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
         }
       }
     })
+  .state('app.login', {
+      url: '/login',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/login.html'
+        }
+      }
+    })
     .state('app.pedidos', {
       url: '/pedidos',
       views: {
@@ -141,5 +150,5 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
     });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/pedidos');
+  $urlRouterProvider.otherwise('/app/mapa');
 });
