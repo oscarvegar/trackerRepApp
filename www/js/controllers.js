@@ -5,7 +5,7 @@ var _HOST_PUSH_SERVER = "http://yoplanner.com:1337";
 
 angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
-.controller('AppCtrl', function($scope, $rootScope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $rootScope, $ionicModal, $timeout, $state) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -24,11 +24,11 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   $rootScope.mensajeConexion = "";
 
   // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
+//  $ionicModal.fromTemplateUrl('templates/login.html', {
+//    scope: $scope
+//  }).then(function(modal) {
+//    $scope.modal = modal;
+//  });
 
   // Triggered in the login modal to close it
   $scope.closeLogin = function() {
@@ -37,7 +37,14 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
   // Open the login modal
   $scope.login = function() {
-    $scope.modal.show();
+    console.log("Usuario: " + $scope.loginData.username + "/" + $scope.loginData.password);
+      angular.forEach($rootScope.repartidores, function(value, key){
+         console.log(value.nombre);
+          if(value.nombre===$scope.loginData.username){
+              $state.go('app.mapa');
+              $rootScope.repartidor = value;
+          }
+      });
   };
 
 

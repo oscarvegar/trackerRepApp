@@ -23,8 +23,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
     $http.get( _HOST_PUSH_SERVER + "/api/repartidor/all").then(function(result){
       console.log( "Result:: ", result );
       if( result.data.length > 0 ){
-        $rootScope.repartidor = result.data[0];
-        console.log("repartidor: ", $rootScope.repartidor);
+        $rootScope.repartidores = result.data;
       }
     });
 
@@ -106,6 +105,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
     controller: 'AppCtrl'
   })
 
+  .state('login', {
+    url: '/login',
+    templateUrl: 'templates/login.html',
+    controller: 'AppCtrl'
+  })
+
   .state('app.search', {
     url: '/search',
     views: {
@@ -121,14 +126,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
       views: {
         'menuContent': {
           templateUrl: 'templates/browse.html'
-        }
-      }
-    })
-  .state('app.login', {
-      url: '/login',
-      views: {
-        'menuContent': {
-          templateUrl: 'templates/login.html'
         }
       }
     })
@@ -152,5 +149,5 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
     });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/mapa');
+  $urlRouterProvider.otherwise('/login');
 });
