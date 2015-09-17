@@ -136,13 +136,11 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   $scope.polylines = [];
   var posOptions = {timeout: 10000, enableHighAccuracy: true};
   io.socket.on('create', function(obj) {
-    $rootScope.ordenSelected = obj;
-    //console.log("Nueva Orden::: " + JSON.stringify($rootScope.ordenSelected)); 
-    //alert("Nueva Orden::: " + $rootScope.ordenSelected ); 
-    // Si el usuairo repartido logueado no esta asignado a la orden, no hacer nada
-    console.log("Nueva Orden para el usuario::: ", $rootScope.user.username ); 
+    console.log("Nueva Orden ** REPARTIDOR ** ::: " + JSON.stringify($rootScope.ordenSelected.repartidor)); 
+    console.log("Nueva Orden para el usuario::: ", $rootScope.ordenSelected.repartidor.usuario.username ); 
     if(!$rootScope.user) $rootScope.user = {username:"oscar.vega"};
-    if( obj.usuario.username !== $rootScope.user.username ) return;
+    $rootScope.ordenSelected = obj;
+    if( $rootScope.ordenSelected.repartidor.usuario.username !== $rootScope.user.username ) return;
     
     if( $rootScope.pedidos.length === 0 ){
       $rootScope.pedidos.push( obj );
@@ -255,7 +253,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
     $ionicLoading.show({
       template: 'Calculando Ruta...'
     });
-    console.log("Clicked en puntos", marker.model);
+    //console.log("Clicked en puntos", marker.model);
     $scope.ordenSelected = marker.model.orden;
     $scope.dibujarTrayecto($scope.ordenSelected);
     $scope.$applyAsync();
