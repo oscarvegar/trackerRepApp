@@ -40,9 +40,13 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
     console.log("Usuario: " + $scope.loginData.username + "/" + $scope.loginData.password);
       angular.forEach($rootScope.repartidores, function(value, key){
          console.log(value.nombre);
-          if(value.nombre===$scope.loginData.username){
-              $state.go('app.mapa');
-              $rootScope.repartidor = value;
+          if(value.usuario.username===$scope.loginData.username){
+            $rootScope.user = value.usuario;
+            console.log("user: ", $rootScope.user);
+            $timeout(function(){$rootScope.sendGeoPosition();},100);
+            $state.go('app.mapa');
+            $rootScope.repartidor = value;
+            return;
           }
       });
   };
@@ -85,7 +89,6 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   });
 
   $scope.init();
-  
 
 })
 
@@ -107,7 +110,9 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
     console.log("Nueva Orden::: ", $rootScope.ordenSelected ); 
     //alert("Nueva Orden::: " + $rootScope.ordenSelected ); 
     // Si el usuairo repartido logueado no esta asignado a la orden, no hacer nada
-    if( obj.usuario.username !== $rootScope.username ) return;
+    console.log("Nueva Orden::: ", $rootScope.user ); 
+    if(!$rootScope.user) $rootScope.user = {username:"oscar.vega"};
+    if( obj.usuario.username !== $rootScope.user.username ) return;
     
     if( $rootScope.pedidos.length === 0 ){
       $rootScope.pedidos.push( obj );
@@ -138,54 +143,62 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   }
 
   $scope.dibujarOrdenes = function(ordenSelected){
-      
-        $scope.puntos.push({ id:$scope.idPointCount++,
-                             latitude:eval(ordenSelected.repartidor.currentLocation.coordinates[1]),
-                             longitude:eval(ordenSelected.repartidor.currentLocation.coordinates[0]),
-                             icon:{url:"img/vespa.png"}
-                          });
+    
+    $scope.puntos.push({ id:$scope.idPointCount++,
+                         latitude:eval(ordenSelected.repartidor.currentLocation.coordinates[1]),
+                         longitude:eval(ordenSelected.repartidor.currentLocation.coordinates[0]),
+                         icon:{url:"img/vespa.png"}
+                      });
 
-        $scope.puntos.push({id:$scope.idPointCount++,
-                            latitude:eval(ordenSelected.modelorama.location.coordinates[1]),
-                            longitude:eval(ordenSelected.modelorama.location.coordinates[0]),
-                            icon:{url:"img/office-building.png"}
-                          });
+    $scope.puntos.push({ id:$scope.idPointCount++,
+                         latitude:eval(ordenSelected.modelorama.location.coordinates[1]),
+                         longitude:eval(ordenSelected.modelorama.location.coordinates[0]),
+                         icon:{url:"img/office-building.png"}
+                      });
+    
+    var puntoOrden = { id:$scope.idPointCount++,
+                         latitude:  eval(ordenSelected.location.coordinates[1]),
+                         longitude: eval(ordenSelected.location.coordinates[0]),
+                         icon:  {url:"img/orden.png"},
+                         orden: ordenSelected,
+                         mostrarDatos: $scope.verDetalle,
+                         options : {animation:google.maps.Animation.BOUNCE}
+                      };
 
-        $scope.puntos.push({id:$scope.idPointCount++,
-                            latitude:eval(ordenSelected.location.coordinates[1]),
-                            longitude:eval(ordenSelected.location.coordinates[0]),
-                            icon:{url:"img/orden.png"},
-                            orden:ordenSelected,
-                            mostrarDatos:$scope.verDetalle
-                          });
+    $scope.puntos.push( puntoOrden );
 
-        
-        var puntosPath = [];
-        for( var iPath in ordenSelected.ruta ){
-          //console.log( "Ruta Simple::", $rootScope.ordenSelected.ruta[iPath] );
-          var pos = ordenSelected.ruta[iPath];
-          var objPath = { latitude: pos[0], longitude: pos[1] };
-          puntosPath.push( objPath );
+    $timeout( function() {
+      puntoOrden.options.animation = null;
+    }, 7000);
+    
+    var puntosPath = [];
+    for( var iPath in ordenSelected.ruta ){
+      //console.log( "Ruta Simple::", $rootScope.ordenSelected.ruta[iPath] );
+      var pos = ordenSelected.ruta[iPath];
+      var objPath = { latitude: pos[0], longitude: pos[1] };
+      puntosPath.push( objPath );
+    }
+    $scope.polylines.push(
+        {
+            id: $scope.idPolyLineCount,
+            path: puntosPath,
+            stroke: {
+                color: '#6060FB',
+                weight: 3
+            },
+            editable: false,
+            draggable: false,
+            geodesic: false,
+            visible: true,
+            icons: [{
+                offset: '25px',
+                repeat: '50px'
+            }]
         }
-        $scope.polylines.push(
-            {
-                id: $scope.idPolyLineCount,
-                path: puntosPath,
-                stroke: {
-                    color: '#6060FB',
-                    weight: 3
-                },
-                editable: false,
-                draggable: false,
-                geodesic: false,
-                visible: true,
-                icons: [{
-                    offset: '25px',
-                    repeat: '50px'
-                }]
-            }
-        );
-      
+    );
+    
+    
+    
   }
 
   $scope.verDetalle = function( marker ){

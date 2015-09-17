@@ -7,7 +7,7 @@
 			<a class="item" href="#">
 				<ui-gmap-google-map center='map.center' zoom='map.zoom'>
 					<ui-gmap-markers models="puntos" coords="'self'" icon="'icon'" 
-						options="'markersOptions'" click="mostrarDatos">
+						options="'options'" click="mostrarDatos">
 					</ui-gmap-markers>
 					<ui-gmap-polyline ng-repeat="p in polylines" path="p.path" stroke="p.stroke" 
 						visible='p.visible' geodesic='p.geodesic' fit="false" editable="p.editable" draggable="p.draggable" icons='p.icons'>

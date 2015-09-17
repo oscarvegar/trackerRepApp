@@ -15,6 +15,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
 
 .run(function($ionicPlatform, $cordovaLocalNotification, $rootScope, $ionicPopup, 
   $interval, $http, $cordovaGeolocation, $state, $timeout, DB) {
+  $rootScope.user = null;
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -37,7 +38,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
       .then(function (position) {
           var latitude  = position.coords.latitude
           var longitude = position.coords.longitude
-          var request = {id:$rootScope.repartidor.id, coordinates:[longitude, latitude]};
+          var request = {id:$rootScope.user.id, coordinates:[longitude, latitude]};
           console.log("enviando posicion: ", request);
           $http.post( _HOST + "/api/repartidor/updateLocation/", request)
           .then(function(res){});
