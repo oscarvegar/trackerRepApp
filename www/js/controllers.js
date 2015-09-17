@@ -21,6 +21,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   $scope.idPointCount = 0;
   $rootScope.pedidos = [];
   $rootScope.username = "oscar.vega";
+  $rootScope.mensajeConexion = "";
 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -57,8 +58,24 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
   $scope.init = function(){
     io.socket.get( _HOST + '/api/orden/subscribe',function(data,jwres){}); 
-    alert("ha quedado subscrito ... " + _HOST ); 
   }
+
+  io.socket.on('connect', function(){
+    console.log('CONECTADO A SERVIDOR');
+    $rootScope.mensajeConexion = "La conexión se ha reestablecido";
+    $rootScope.isConnected = true;
+    $rootScope.color = "green";
+    $timeout(function(){
+      $rootScope.mensajeConexion = null;
+    },2000);
+    $scope.init();
+  });
+
+  io.socket.on('disconnect', function(){
+    $rootScope.isConnected = false;
+    $rootScope.color = "red";
+    $rootScope.mensajeConexion = "Se ha perdido la conexión con el servidor de mensajes, intentando reconexión ...";
+  });
 
   $scope.init();
   
@@ -70,9 +87,10 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   $scope.goMapa = function(index){
     $rootScope.ordenSelected = $rootScope.pedidos[index];
   }
+
 })
 
-.controller('MapaCtrl', function( $scope, $rootScope, $timeout ){  
+.controller('MapaCtrl', function( $scope, $rootScope, $timeout, $cordovaLocalNotification, $ionicScrollDelegate ){  
   $scope.puntos = [];
   $scope.polylines = [];
 
@@ -80,7 +98,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   io.socket.on('create', function(obj) {
     $rootScope.ordenSelected = obj;
     console.log("Nueva Orden::: ", $rootScope.ordenSelected ); 
-    alert("Nueva Orden::: " + $rootScope.ordenSelected ); 
+    //alert("Nueva Orden::: " + $rootScope.ordenSelected ); 
     // Si el usuairo repartido logueado no esta asignado a la orden, no hacer nada
     if( obj.usuario.username !== $rootScope.username ) return;
     
@@ -101,17 +119,15 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
     console.log("Nueva Orden - pedidos-: ", $rootScope.pedidos); 
     $scope.dibujarOrdenes(obj); 
     $scope.$applyAsync();
-    $ionicScrollDelegate.scrollBottom(true);
+    $ionicScrollDelegate.$getByHandle('mainScroll').scrollBottom();
     $rootScope.scheduleSingleNotification( ++$scope.idCount, obj );
   });
-
 
   $scope.initMap = function() {
     $scope.map = { center: { latitude: 19.432791, longitude: -99.1335314 }, zoom: 10 };
     if( $rootScope.pedidos.length > 0 ){
       $scope.dibujarOrdenes();
     }
-
   }
 
   $scope.dibujarOrdenes = function(ordenSelected){
@@ -131,7 +147,9 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
         $scope.puntos.push({id:$scope.idPointCount++,
                             latitude:eval(ordenSelected.location.coordinates[1]),
                             longitude:eval(ordenSelected.location.coordinates[0]),
-                            icon:{url:"img/orden.png"}
+                            icon:{url:"img/orden.png"},
+                            orden:ordenSelected,
+                            mostrarDatos:$scope.verDetalle
                           });
 
         
@@ -161,6 +179,11 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
             }
         );
       
+  }
+
+  $scope.verDetalle = function( marker ){
+    console.log("Clicked en puntos", marker.model);
+    $scope.ordenSelected = marker.model.orden;
   }
 
 

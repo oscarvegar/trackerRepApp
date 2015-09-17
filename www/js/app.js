@@ -18,6 +18,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
+    var _HOST = "http://yoplanner.com:1337";
+    io.sails.url = 'http://yoplanner.com:1337';
     $http.get( _HOST_PUSH_SERVER + "/api/repartidor/all").then(function(result){
       console.log( "Result:: ", result );
       if( result.data.length > 0 ){
@@ -73,7 +75,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
    $rootScope.$on('$cordovaLocalNotification:click',
       function (event, notification, state) {
         //alert("notification **ver detalle de la compra**: " );
-        $state.go("app.pedidos");
+        $state.go("app.mapa");
     });
 
     if (window.cordova && window.cordova.plugins.Keyboard) {

@@ -1,12 +1,14 @@
 <ion-view view-title="MAPA">
-	<ion-content>
+	<ion-content delegate-handle="mainScroll">
 		<style type="text/css">
-			.angular-google-map-container { height: 75vh; }
+			.angular-google-map-container { height: 60vh; }
 		</style>
 		<div  class="list">
 			<a class="item" href="#">
 				<ui-gmap-google-map center='map.center' zoom='map.zoom'>
-					<ui-gmap-markers models="puntos" coords="'self'" icon="'icon'"></ui-gmap-markers>
+					<ui-gmap-markers models="puntos" coords="'self'" icon="'icon'" 
+						options="'markersOptions'" click="mostrarDatos">
+					</ui-gmap-markers>
 					<ui-gmap-polyline ng-repeat="p in polylines" path="p.path" stroke="p.stroke" 
 						visible='p.visible' geodesic='p.geodesic' fit="false" editable="p.editable" draggable="p.draggable" icons='p.icons'>
 					</ui-gmap-polyline>
@@ -40,7 +42,9 @@
       				</table>
       			</p>
       		</a>
-
+      		<a class="item" href="#" ng-show="ordenSelected">
+      			<p>&nbsp;</p>
+      		</a>
 		</div>
 	</ion-content>
 </ion-view>

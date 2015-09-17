@@ -11,13 +11,12 @@
     <link type="text/css" rel="stylesheet" href="css/bootstrap.css">
     <link type="text/css" rel="stylesheet" href="css/core.css">
     <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
+    <link href="css/ionicons.css" rel="stylesheet">
 
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
     -->
 
-    <script src="lib/sails.io.js"></script>
-    
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
 
@@ -37,7 +36,7 @@
 
 
     <!-- your app's js -->
-    
+    <script src="lib/sails.io.js"></script>
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
@@ -52,8 +51,12 @@
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href=""><img src="img/logo-modelonow.png">
-                </a>
+                <a class="navbar-brand" href=""><img src="img/logo-modelonow.png"></a><br/>
+                <div style="margin-top:35px;">
+                    <span style="color:{{color}}">
+                        <i class="icon ion-ios-reload" ng-hide="isConnected"></i>{{mensajeConexion}}
+                    </span>
+                </div>
             </div>
         </div>
     </nav>

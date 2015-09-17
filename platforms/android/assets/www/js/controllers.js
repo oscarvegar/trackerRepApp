@@ -57,7 +57,6 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
   $scope.init = function(){
     io.socket.get( _HOST + '/api/orden/subscribe',function(data,jwres){}); 
-    alert("ha quedado subscrito ... " + _HOST ); 
   }
 
   $scope.init();
@@ -72,7 +71,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   }
 })
 
-.controller('MapaCtrl', function( $scope, $rootScope, $timeout ){  
+.controller('MapaCtrl', function( $scope, $rootScope, $timeout, $cordovaLocalNotification, $ionicScrollDelegate ){  
   $scope.puntos = [];
   $scope.polylines = [];
 
@@ -80,7 +79,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   io.socket.on('create', function(obj) {
     $rootScope.ordenSelected = obj;
     console.log("Nueva Orden::: ", $rootScope.ordenSelected ); 
-    alert("Nueva Orden::: " + $rootScope.ordenSelected ); 
+    //alert("Nueva Orden::: " + $rootScope.ordenSelected ); 
     // Si el usuairo repartido logueado no esta asignado a la orden, no hacer nada
     if( obj.usuario.username !== $rootScope.username ) return;
     
@@ -101,7 +100,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
     console.log("Nueva Orden - pedidos-: ", $rootScope.pedidos); 
     $scope.dibujarOrdenes(obj); 
     $scope.$applyAsync();
-    $ionicScrollDelegate.scrollBottom(true);
+    $ionicScrollDelegate.$getByHandle('mainScroll').scrollBottom();
     $rootScope.scheduleSingleNotification( ++$scope.idCount, obj );
   });
 
