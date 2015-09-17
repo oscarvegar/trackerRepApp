@@ -11,11 +11,11 @@ io.sails.url = 'http://yoplanner.com:1337';
 var _HOST_PUSH_SERVER = "http://yoplanner.com:1337";
 
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama', 'dao',
-  'ngCordova', 'uiGmapgoogle-maps'])
+  'ngCordova', 'nemLogging', 'uiGmapgoogle-maps'])
 
 .run(function($ionicPlatform, $cordovaLocalNotification, $rootScope, $ionicPopup, 
   $interval, $http, $cordovaGeolocation, $state, $timeout, DB) {
-  $rootScope.user = null;
+  $rootScope.user = null; 
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -44,33 +44,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
           .then(function(res){});
         }, function(err) { });
     }
-
-    $rootScope.scheduleSingleNotification = function (id, data) {
-      $cordovaLocalNotification.schedule({
-        id: id,
-        title: 'NUEVA ORDEN DE ENTREGA',
-        text: 'Tienes una nueva orden de entrega',
-        data: data
-      }).then(function (result) {
-        var myPopup = $ionicPopup.show({
-            template: '<center>Tienes una nueva orden de entrega</center>',
-            title: 'NUEVA ORDEN DE ENTREGA',
-            scope: $scope,
-            buttons: [ { text: 'Cancelar' },
-                       {text: '<b>Aceptar</b>',type: 'button-positive',
-                        onTap:function(e){
-                          return data;
-                        }}]
-        });
-         myPopup.then(function(res) {
-            if(res){
-                alert("Ver detalle de la compra: " + res);
-            }
-        });
-      });
-
-
-    };
 
    $rootScope.$on('$cordovaLocalNotification:click',
       function (event, notification, state) {

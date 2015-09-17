@@ -5,7 +5,8 @@ var _HOST_PUSH_SERVER = "http://yoplanner.com:1337";
 
 angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
-.controller('AppCtrl', function($scope, $rootScope, $ionicModal, $timeout, $state) {
+.controller('AppCtrl', function($scope, $rootScope, $ionicModal, $timeout, $state, 
+                                $cordovaLocalNotification, $ionicPopup) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -29,6 +30,31 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 //  }).then(function(modal) {
 //    $scope.modal = modal;
 //  });
+
+    $rootScope.scheduleSingleNotification = function (id, data) {
+      $cordovaLocalNotification.schedule({
+        id: id,
+        title: 'NUEVA ORDEN DE ENTREGA',
+        text: 'Tienes una nueva orden de entrega',
+        data: data
+      }).then(function (result) {
+        var myPopup = $ionicPopup.show({
+            template: '<center>Tienes una nueva orden de entrega</center>',
+            title: 'NUEVA ORDEN DE ENTREGA',
+            scope: $scope,
+            buttons: [ { text: 'Cancelar' },
+                       {text: '<b>Aceptar</b>',type: 'button-positive',
+                        onTap:function(e){
+                          return data;
+                        }}]
+        });
+         myPopup.then(function(res) {
+            if(res){
+                //alert("Ver detalle de la compra: " + res);
+            }
+        });
+      });
+    };
 
   // Triggered in the login modal to close it
   $scope.closeLogin = function() {
@@ -83,9 +109,11 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   });
 
   io.socket.on('disconnect', function(){
+    console.log("Se perdio la conexion con el servidor....");
     $rootScope.isConnected = false;
     $rootScope.color = "red";
     $rootScope.mensajeConexion = "Se ha perdido la conexión con el servidor de mensajes, intentando reconexión ...";
+    $rootScope.$apply();
   });
 
   $scope.init();
@@ -107,7 +135,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
   io.socket.on('create', function(obj) {
     $rootScope.ordenSelected = obj;
-    console.log("Nueva Orden::: ", $rootScope.ordenSelected ); 
+    //console.log("Nueva Orden::: " + JSON.stringify($rootScope.ordenSelected)); 
     //alert("Nueva Orden::: " + $rootScope.ordenSelected ); 
     // Si el usuairo repartido logueado no esta asignado a la orden, no hacer nada
     console.log("Nueva Orden::: ", $rootScope.user ); 
@@ -167,10 +195,12 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
     $scope.puntos.push( puntoOrden );
 
-    $timeout( function() {
-      puntoOrden.options.animation = null;
-    }, 7000);
     
+    $timeout( function() {
+      puntoOrden.options.animation = google.maps.Animation.DROP;
+      //puntoOrden.mostrarDatos = $scope.verDetalle;
+    }, 7000, true);
+
     var puntosPath = [];
     for( var iPath in ordenSelected.ruta ){
       //console.log( "Ruta Simple::", $rootScope.ordenSelected.ruta[iPath] );
@@ -196,9 +226,6 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
             }]
         }
     );
-    
-    
-    
   }
 
   $scope.verDetalle = function( marker ){

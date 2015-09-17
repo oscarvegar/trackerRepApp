@@ -5,15 +5,27 @@
 		</style>
 		<div  class="list">
 			<a class="item" href="#">
-				<ui-gmap-google-map center='map.center' zoom='map.zoom'>
+				<ui-gmap-google-map center='map.center' zoom='map.zoom' data-tap-disabled="true">
 					<ui-gmap-markers models="puntos" coords="'self'" icon="'icon'" 
-						options="'options'" click="mostrarDatos">
+						options="'options'" click="mostrarDatos"  >
 					</ui-gmap-markers>
 					<ui-gmap-polyline ng-repeat="p in polylines" path="p.path" stroke="p.stroke" 
 						visible='p.visible' geodesic='p.geodesic' fit="false" editable="p.editable" draggable="p.draggable" icons='p.icons'>
 					</ui-gmap-polyline>
 				</ui-gmap-google-map>
 			</a>
+			<a class="item" href="#" ng-show="ordenSelected">
+				<h2>Detalle del Pedido</h2>
+      			<p>
+      				<table>
+      					<tr ng-repeat="producto in ordenSelected.detail">
+      						<td>{{producto.cantidad}}</td>
+      						<td> - </td>
+      						<td>{{producto.producto.presentacion}}</td>
+      					</tr>
+      				</table>
+      			</p>
+      		</a>
 			<a class="item" href="#" ng-show="ordenSelected">
 				<h2>TOTAL DE LA COMPRA</h2>
       			<p>{{ordenSelected.totalCompra | currency}}</p>
@@ -30,21 +42,7 @@
 				<h2>Modelorama mas cercano</h2>
       			<p>{{ordenSelected.modelorama.direccion}}</p>
       		</a>
-      		<a class="item" href="#" ng-show="ordenSelected">
-				<h2>Detalle del Pedido</h2>
-      			<p>
-      				<table>
-      					<tr ng-repeat="producto in ordenSelected.detalle">
-      						<td>{{producto.cantidad}}</td>
-      						<td>-</td>
-      						<td>{{producto.producto}}</td>
-      					</tr>
-      				</table>
-      			</p>
-      		</a>
-      		<a class="item" href="#" ng-show="ordenSelected">
-      			<p>&nbsp;</p>
-      		</a>
 		</div>
+		<br/><br/>
 	</ion-content>
 </ion-view>
