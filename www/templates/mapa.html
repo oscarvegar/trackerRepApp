@@ -6,6 +6,8 @@
 		<ul  class="list">
 			<li class="item">
 				<ui-gmap-google-map center='map.center' zoom='map.zoom' data-tap-disabled="true">
+					<ui-gmap-marker coords="marker.coords" idkey="0" icon="marker.icon">
+        </ui-gmap-marker>
 					<ui-gmap-markers models="puntos" coords="'self'" icon="'icon'" 
 						options="'options'" click="mostrarDatos"  >
 					</ui-gmap-markers>

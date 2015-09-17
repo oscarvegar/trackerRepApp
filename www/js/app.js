@@ -32,12 +32,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.Modelorama',
       $rootScope.sendGeoPosition();
     },30000);
 
+    $rootScope.marker = { id: 0, coords: { latitude: 40.1451, longitude: -99.6680},icon:{url:"img/vespa.png"}};
+
     $rootScope.sendGeoPosition = function() {
       var posOptions = {timeout: 10000, enableHighAccuracy: true};
       $cordovaGeolocation.getCurrentPosition(posOptions)
       .then(function (position) {
           var latitude  = position.coords.latitude
           var longitude = position.coords.longitude
+          $rootScope.marker.coords.latitude  = latitude;
+          $rootScope.marker.coords.longitude = longitude;
           var request = {id:$rootScope.user.id, coordinates:[longitude, latitude]};
           console.log("enviando posicion: ", request);
           $http.post( _HOST + "/api/repartidor/updateLocation/", request)
