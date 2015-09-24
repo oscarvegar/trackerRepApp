@@ -66,17 +66,24 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   // Open the login modal
   $scope.login = function() {
     console.log("Usuario: " + $scope.loginData.username + "/" + $scope.loginData.password);
-      angular.forEach($rootScope.repartidores, function(value, key){
-         console.log(value.nombre);
-          if(value.usuario.username===$scope.loginData.username){
-            $rootScope.user = value.usuario;
-            console.log("user: ", $rootScope.user);
-            $timeout(function(){$rootScope.sendGeoPosition();},100);
-            $state.go('app.mapa');
-            $rootScope.repartidor = value;
-            return;
-          }
-      });
+    for( var iRep in $rootScope.repartidores) {
+      var value = $rootScope.repartidores[iRep];
+      console.log(value.nombre);
+      if(value.usuario.username===$scope.loginData.username){
+        $rootScope.user = value.usuario;
+        console.log("user: ", $rootScope.user);
+        $timeout(function(){$rootScope.sendGeoPosition();},100);
+        $state.go('app.mapa');
+        $rootScope.repartidor = value;
+        return;
+      }
+    }
+    $scope.myPopup = $ionicPopup.show({
+          template: '<center>El usuario y/o contraseña son incorrectos</center>',
+          title: 'LOGIN',
+          scope: $scope,
+          buttons: [ { text: 'Cancelar' }]
+          });
   };
 
 
@@ -136,8 +143,8 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
   $scope.polylines = [];
   var posOptions = {timeout: 10000, enableHighAccuracy: true};
   io.socket.on('create', function(obj) {
-    console.log("Nueva Orden ** REPARTIDOR ** ::: " + JSON.stringify($rootScope.ordenSelected.repartidor)); 
-    console.log("Nueva Orden para el usuario::: ", $rootScope.ordenSelected.repartidor.usuario.username ); 
+    //console.log("Nueva Orden ** REPARTIDOR ** ::: " + JSON.stringify($rootScope.ordenSelected.repartidor)); 
+    //console.log("Nueva Orden para el usuario::: ", $rootScope.ordenSelected.repartidor.usuario.username ); 
     if(!$rootScope.user) $rootScope.user = {username:"oscar.vega"};
     $rootScope.ordenSelected = obj;
     if( $rootScope.ordenSelected.repartidor.usuario.username !== $rootScope.user.username ) return;
